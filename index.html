@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>建造者世界 Builder World · $建造世界</title>
+<meta name="description" content="建造者世界：$建造世界 是母代币。下面是一份固定的建造材料清单（砖、钢、木、水泥、玻璃……），每种材料都是与 $建造世界 配对的 BNB Chain 代币。在任意材料上发射代币，持有者就以该材料获得分红。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Crect width='16' height='16' rx='3' fill='%23F0B90B'/%3E%3Crect x='4' y='3' width='8' height='3' fill='%23181a20'/%3E%3Crect x='3' y='6' width='10' height='7' fill='%23181a20'/%3E%3Crect x='5' y='8' width='2' height='2' fill='%23fff'/%3E%3Crect x='9' y='8' width='2' height='2' fill='%23fff'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#f5f5f1; --card:#ffffff; --line:#e6e6e0; --ink:#181a20; --ink2:#2b3139; --grey:#707a8a; --grey2:#b7bdc6; --soft:#f0f0ea;
+  --y:#F0B90B; --y2:#FCD535; --ydeep:#c99400; --ysoft:#fff6d6; --green:#0ecb81; --red:#f6465d;
+  --cn:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif; --en:"Inter",ui-sans-serif,system-ui,sans-serif; --mono:"JetBrains Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:400 15px/1.7 var(--en),var(--cn);-webkit-font-smoothing:antialiased}
+body,h1,h2,h3,p,button{font-family:var(--en),var(--cn)}
+a{color:inherit;text-decoration:none}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+.mono{font-family:var(--mono)}
+canvas.pix{image-rendering:pixelated;image-rendering:crisp-edges}
+.ann{background:var(--ink);color:#eaecef;font-size:13px;text-align:center;padding:7px 40px;position:relative}
+.ann b{color:var(--y);font-weight:700}
+.ann i{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--y);margin-right:8px;vertical-align:2px;box-shadow:0 0 8px var(--y)}
+.ann button{position:absolute;right:10px;top:4px;border:0;background:none;color:var(--grey2);font-size:16px}
+header{position:sticky;top:0;z-index:30;background:rgba(245,245,241,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.hd{max-width:1180px;margin:0 auto;display:flex;align-items:center;gap:12px;padding:12px 20px}
+.mbtn{width:34px;height:34px;border:1px solid var(--line);background:#fff;border-radius:8px;display:grid;place-items:center}
+.crumb{font-size:14px;color:var(--grey)}.crumb b{color:var(--ink);font-weight:600}
+.hd .sp{flex:1}
+.cachip{display:flex;align-items:center;gap:6px;border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 10px;font:500 12.5px var(--mono);color:var(--ink2)}
+.cachip button{border:0;background:none;padding:0;color:var(--grey)}
+.wbtn{border:0;background:var(--ink);color:#fff;border-radius:8px;padding:9px 16px;font-weight:600;font-size:14px}
+.wbtn.on{background:var(--y);color:var(--ink)}
+#drawer{position:fixed;left:16px;top:66px;z-index:40;width:250px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 20px 40px -20px rgba(0,0,0,.25);padding:8px;display:none}
+#drawer.on{display:block}
+#drawer a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;font-size:14.5px}
+#drawer a:hover{background:var(--soft)}
+#drawer a i{font-style:normal;width:22px;text-align:center}
+main{max-width:1180px;margin:0 auto;padding:18px 20px 60px}
+/* hero */
+.hero{position:relative;border-radius:22px;overflow:hidden;padding:48px clamp(20px,9vw,128px) 20px;color:var(--ink);
+  background:radial-gradient(ellipse at 85% 10%,rgba(255,255,255,.55),transparent 40%),radial-gradient(ellipse at 10% 100%,#c99400,transparent 55%),linear-gradient(135deg,#FCD535 0%,#F0B90B 45%,#e0a800 75%,#b88a00 100%)}
+.hero::after{content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(24,26,32,.08) 1px,transparent 1px);background-size:14px 14px;pointer-events:none}
+.hero>*{position:relative;z-index:1}
+.eyebrow{font:700 12px var(--en);letter-spacing:.16em;color:rgba(24,26,32,.7)}
+.hero h1{margin:10px 0 16px;font:900 clamp(34px,5.6vw,62px)/1.12 var(--cn);letter-spacing:-.01em}
+.hero p.lead{max-width:600px;margin:0;font-size:16px;color:var(--ink2)}
+.hstats{display:grid;grid-template-columns:repeat(4,auto);gap:12px 44px;margin:26px 0 24px;justify-content:start}
+.hstats span{display:block;font:700 11.5px var(--en);letter-spacing:.12em;color:rgba(24,26,32,.65)}
+.hstats b{display:block;font:800 22px var(--en);margin-top:2px}
+.hcta{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:8px;padding:10px 16px;font-weight:600;font-size:14.5px;border:1px solid transparent;transition:transform .12s}
+.btn:hover{transform:translateY(-1px)}
+.btn.k{background:var(--ink);color:#fff}
+.btn.w{background:rgba(255,255,255,.35);border-color:rgba(24,26,32,.25);color:var(--ink)}
+.btn.y{background:var(--y);color:var(--ink)}
+.btn.o{background:#fff;border-color:var(--line);color:var(--ink)}
+.tokchip{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:14px;color:var(--ink)}
+.tokchip canvas{width:20px;height:20px}
+.stage{position:relative;height:330px;margin-top:6px}
+#world{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(560px,100%);height:330px;cursor:pointer}
+.orb{position:absolute;width:58px;height:58px;border-radius:50%;background:#fff;box-shadow:0 10px 24px -10px rgba(0,0,0,.35);display:grid;place-items:center;cursor:pointer;transition:transform .2s}
+.orb:hover{transform:scale(1.12)}
+.orb canvas{width:34px;height:34px}
+.orb .lbl{position:absolute;top:62px;left:50%;transform:translateX(-50%);white-space:nowrap;font:700 12px var(--cn);background:rgba(24,26,32,.85);color:#fff;padding:1px 8px;border-radius:6px;opacity:0;transition:opacity .2s;pointer-events:none}
+.orb:hover .lbl{opacity:1}
+.bubble{position:absolute;z-index:6;left:calc(50% - 80px);top:34px;transform:translateX(-50%);background:#fff;border:1px solid rgba(24,26,32,.15);border-radius:12px;padding:6px 12px;font:500 13.5px var(--cn);box-shadow:0 8px 20px -10px rgba(0,0,0,.3);white-space:nowrap;opacity:0;transition:opacity .3s}
+.bubble.on{opacity:1}
+/* strip */
+.strip{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:16px 0 34px;padding:14px 18px;border-radius:12px;background:var(--ysoft);border:1px solid #f3dc8a;font-size:14.5px}
+.strip b{font-weight:700}.strip .g{color:var(--ydeep);font-weight:700}
+.strip a{margin-left:auto;font-weight:600;color:var(--ink)}
+.sh{display:flex;align-items:flex-end;gap:12px;margin-bottom:12px}
+.sh h2{margin:0;font:800 20px var(--cn)}
+.sh p{margin:2px 0 0;color:var(--grey);font-size:13.5px}
+.sh a{margin-left:auto;color:var(--ydeep);font-weight:600;font-size:14px;white-space:nowrap}
+/* materials */
+.mats{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:36px}
+.mat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;cursor:pointer;transition:box-shadow .15s,transform .15s}
+.mat:hover{box-shadow:0 12px 30px -18px rgba(0,0,0,.35);transform:translateY(-2px)}
+.mat .top{display:flex;align-items:center;gap:12px}
+.mat .ic{width:48px;height:48px;border-radius:50%;background:var(--soft);display:grid;place-items:center;overflow:hidden;flex:none;border:1px solid var(--line)}
+.mat .ic canvas{width:36px;height:36px}
+.mat .nm b{display:block;font:700 16px var(--cn)}
+.mat .nm span{font-size:13px;color:var(--grey);font-weight:600}
+.mat .no{margin-left:auto;align-self:flex-start;font:600 12px var(--en);color:var(--grey2)}
+.mat .bot{display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-size:13px;color:var(--grey)}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 10px;font:600 12px var(--cn);background:var(--ysoft);color:#8a6a00;border:1px solid #f3dc8a}
+.pill i{width:6px;height:6px;border-radius:50%;background:var(--y)}
+.mat.more{display:grid;place-items:center;border-style:dashed;color:var(--grey);font-weight:600;min-height:130px}
+/* coins */
+.tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.search{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 14px;min-width:240px}
+.search input{border:0;outline:none;background:none;width:100%;font-size:14px}
+.tools .sp{flex:1}
+.seg{display:flex;align-items:center;gap:2px;font-size:13px;color:var(--grey)}
+.seg button{border:0;background:none;padding:6px 10px;border-radius:8px;font-weight:600;color:var(--grey)}
+.seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 0 var(--line),0 0 0 1px var(--line)}
+select{border:1px solid var(--line);border-radius:8px;background:#fff;padding:7px 10px;font-size:13.5px}
+.coins{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.crow{display:grid;grid-template-columns:44px 1.4fr 1fr 1fr 1fr 90px;gap:12px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line);font-size:14px}
+.crow:last-child{border-bottom:0}
+.crow.h{font:700 11.5px var(--en);letter-spacing:.08em;color:var(--grey);background:var(--soft);padding:9px 16px}
+.crow canvas{width:40px;height:40px;border-radius:10px;background:var(--ink)}
+.crow b{display:block;font:700 14.5px var(--cn)}
+.crow small{color:var(--grey);font-size:12.5px}
+.crow .g{color:var(--green);font-weight:700}
+.crow .tag{font:600 11px var(--cn);color:#8a6a00;background:var(--ysoft);border-radius:6px;padding:1px 6px;margin-left:6px}
+.emptyc{padding:36px;text-align:center;color:var(--grey)}
+.more2{display:block;text-align:center;margin:12px 0 34px;color:var(--ydeep);font-weight:600;font-size:14px}
+.samp{font:600 11px var(--cn);color:#8a6a00;background:var(--ysoft);border:1px solid #f3dc8a;border-radius:999px;padding:2px 10px}
+/* live */
+.live{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:34px}
+.live .lh{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line);font-weight:700}
+.live .lh i{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pl 1.6s infinite}
+@keyframes pl{50%{opacity:.3}}
+.live .lh .samp{margin-left:auto}
+.lrow{display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid var(--line);font-size:14px}
+.lrow:last-child{border-bottom:0}
+.lrow canvas{width:26px;height:26px;border-radius:50%;background:var(--soft)}
+.lrow .g{color:var(--green);font-weight:700}
+.lrow a{margin-left:auto;color:var(--grey);font-size:13px}
+.lrow.new{animation:nw 1s}
+@keyframes nw{from{background:var(--ysoft)}}
+/* how */
+.how{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:34px}
+.how div{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px}
+.how b{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:8px;background:var(--ink);color:var(--y);font-weight:800;margin-bottom:10px}
+.how h3{margin:0 0 6px;font:800 16px var(--cn)}
+.how p{margin:0;color:var(--ink2);font-size:14px}
+.dark{background:var(--ink);color:#eaecef;border-radius:22px;padding:30px clamp(20px,5vw,48px);margin-bottom:34px;display:grid;grid-template-columns:1.2fr 1fr;gap:30px;align-items:center}
+.dark h2{margin:0 0 10px;font:900 28px/1.25 var(--cn)}.dark h2 em{font-style:normal;color:var(--y)}
+.dark p{color:#b7bdc6;margin:0 0 16px}
+.flow{display:flex;flex-direction:column;gap:10px}
+.flow div{display:flex;align-items:center;gap:12px;background:#22262e;border:1px solid #2f3540;border-radius:12px;padding:12px 14px;font-size:14px}
+.flow div b{color:var(--y);font:800 13px var(--en);min-width:52px}
+.flow .ar{background:none;border:0;padding:0;justify-content:center;color:var(--grey);font-size:14px}
+footer{max-width:1180px;margin:0 auto;padding:20px 20px 50px;color:var(--grey);font-size:12.5px;border-top:1px solid var(--line)}
+/* modals */
+.modal{position:fixed;inset:0;z-index:60;background:rgba(24,26,32,.5);display:none;align-items:center;justify-content:center;padding:16px}
+.modal.on{display:flex}
+.mb{width:min(620px,100%);max-height:calc(100vh - 32px);overflow:auto;background:#fff;border-radius:18px;box-shadow:0 30px 70px -20px rgba(0,0,0,.45)}
+.mb .mh{display:flex;align-items:center;gap:10px;padding:16px 20px;border-bottom:1px solid var(--line);font:800 17px var(--cn)}
+.mb .mh button{margin-left:auto;border:0;background:var(--soft);width:32px;height:32px;border-radius:8px}
+.mb .bd{padding:18px 20px}
+.f label{display:block;font:700 12.5px var(--cn);color:var(--grey);margin:12px 0 6px}
+.f label:first-child{margin-top:0}
+.f input,.f textarea,.f select{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;outline:none;background:#fff;font-size:14.5px}
+.f input:focus,.f textarea:focus{border-color:var(--y);box-shadow:0 0 0 3px rgba(240,185,11,.2)}
+.f .r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mgrid{display:flex;flex-wrap:wrap;gap:8px}
+.mgrid button{display:flex;align-items:center;gap:6px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:5px 12px 5px 6px;font:600 13px var(--cn)}
+.mgrid button canvas{width:22px;height:22px}
+.mgrid button.on{border-color:var(--ink);background:var(--ink);color:#fff}
+.note{margin-top:14px;padding:12px 14px;border-radius:10px;background:var(--ysoft);border:1px solid #f3dc8a;font-size:13.5px;color:#6a5200}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;font-size:14px}
+.kv span{color:var(--grey)}.kv b{font-weight:700}
+.steps li{margin:0 0 8px}
+#toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,16px);opacity:0;z-index:90;background:var(--ink);color:#fff;padding:11px 18px;border-radius:10px;font:500 14px var(--cn);transition:.25s;pointer-events:none;max-width:calc(100% - 32px);border-left:4px solid var(--y)}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+@media (max-width:860px){.hstats{grid-template-columns:repeat(2,auto)}.mats{grid-template-columns:1fr}.how{grid-template-columns:1fr}.dark{grid-template-columns:1fr}.crow{grid-template-columns:40px 1.4fr 1fr 80px}.crow .c4,.crow .c5{display:none}}
+@media (max-width:560px){.cachip{display:none}.hero{padding:30px 18px 10px}.stage{height:280px}#world{height:280px}.orb{width:46px;height:46px}.orb canvas{width:28px;height:28px}.strip a{margin-left:0}.search{min-width:0;flex:1}.f .r2{grid-template-columns:1fr}.crow{grid-template-columns:40px 1fr 72px}.crow .c3{display:none}}
+</style>
+</head>
+<body>
+<div class="ann" id="ann"><i></i><b>新</b> 材料已上线。在任意材料上发射代币，持有者就以该材料获得分红。<button type="button" aria-label="关闭" onclick="this.parentNode.remove()">×</button></div>
+<header><div class="hd">
+  <button class="mbtn" id="mBtn" type="button" aria-label="菜单">≡</button>
+  <span class="crumb">建造者世界 / <b id="crumbT">首页</b></span>
+  <span class="sp"></span>
+  <span class="cachip">CA <span id="caShort">发射后公布</span><button type="button" id="caCopy" aria-label="复制">⧉</button></span>
+  <a class="mbtn" id="xTop" href="#" target="_blank" rel="noopener noreferrer" aria-label="X"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 2H22l-7.2 8.2L23 22h-6.6l-5.2-6.8L5.3 22H2.2l7.7-8.8L1.8 2h6.8l4.7 6.2L18.9 2Zm-1.2 18h1.7L7.4 3.9H5.6L17.7 20Z"/></svg></a>
+  <button class="wbtn" id="conn" type="button">连接钱包</button>
+</div></header>
+<nav id="drawer"><a href="#top"><i>⌂</i>首页</a><a href="#mats"><i>▦</i>全部材料</a><a href="#coins"><i>◎</i>全部代币</a><a href="#live"><i>●</i>实时派发</a><a href="#how"><i>?</i>运作方式</a><a href="#" id="launchNav"><i>＋</i>发射代币</a><a href="https://x.com/BuilderWorldBNB" target="_blank" rel="noopener noreferrer"><i>𝕏</i>@BuilderWorldBNB</a></nav>
+
+<main id="top">
+<section class="hero">
+  <div class="eyebrow">建造者世界 · BUILDER WORLD</div>
+  <h1>一起建造这个世界。</h1>
+  <p class="lead">$建造世界 是母代币。它下面有一份固定的建造材料清单（砖、钢、木、水泥、玻璃等），每种材料都是一个与 $建造世界 配对的 BNB Chain 代币。在任意材料上发射代币，它的持有者就以这种材料获得分红。持有材料，就能从建在它上面的每一个代币里获得收益。</p>
+  <div class="hstats">
+    <div><span>材料</span><b id="hMat">0 / 50</b></div>
+    <div><span>已发射代币</span><b id="hCoins">0</b></div>
+    <div><span>已派发给持有者</span><b id="hPaid">0 BNB</b></div>
+    <div><span>下次派发</span><b id="hNext">05:00</b></div>
+  </div>
+  <div class="hcta"><button class="btn k" type="button" id="launchB">发射代币 →</button><a class="btn w" href="#mats">查看材料 →</a><a class="tokchip" id="tokA" href="#" target="_blank" rel="noopener noreferrer"><canvas class="pix" id="tokC" width="16" height="16"></canvas>$建造世界 <span id="tokMc">发射后显示</span> ↗</a></div>
+  <div class="stage" id="stage">
+    <canvas class="pix" id="world" width="240" height="141" aria-label="一个金、黑、白三色的像素建造者机器人站在一个小小的像素世界上，周围环绕着五种建造材料"></canvas>
+    <div class="bubble" id="bubble">我是建造者，点我！👷</div>
+  </div>
+</section>
+
+<div class="strip"><b>持有材料？</b>建在它上面的每一个代币都会以这种材料给你分红。奖池中：<span class="g" id="pot">0 BNB</span><span class="samp">示例</span><a href="#how">运作方式 →</a></div>
+
+<section id="mats">
+  <div class="sh"><div><h2>材料</h2><p>固定清单。只有建造者世界可以添加材料，每一种都与 $建造世界 配对。</p></div><a href="#" id="allMats">全部材料 →</a></div>
+  <div class="mats" id="matGrid"></div>
+</section>
+
+<section id="coins">
+  <div class="sh"><div><h2>代币</h2><p>发射在某种材料上。每个代币都以它所配对的材料向持有者分红。</p></div><span class="samp" style="margin-left:auto">示例数据 · 上线后为实时数据</span></div>
+  <div class="tools"><label class="search">🔍<input id="q" placeholder="搜索代币或材料" aria-label="搜索"></label><span class="sp"></span><div class="seg" id="sortSeg">排序 <button type="button" class="on" data-s="mc">市值</button><button type="button" data-s="new">最新</button><button type="button" data-s="paid">已派发</button></div><select id="matSel" aria-label="按材料筛选"><option value="">全部材料</option></select></div>
+  <div class="coins" id="coinList"></div>
+  <a class="more2" href="#" id="moreCoins">浏览全部代币 →</a>
+</section>
+
+<section id="live">
+  <div class="live"><div class="lh"><i></i>实时<span class="samp">示例动态</span></div><div id="liveList"></div></div>
+</section>
+
+<section id="how">
+  <div class="sh"><div><h2>运作方式</h2><p>母代币 → 材料 → 代币。手续费沿着这条线往回流。</p></div></div>
+  <div class="how">
+    <div><b>1</b><h3>选一种材料</h3><p>砖、钢、木、水泥、玻璃……每种材料都是与 $建造世界 配对的 BEP-20 代币，清单固定，最多 50 种。</p></div>
+    <div><b>2</b><h3>在上面发射代币</h3><p>名称、代码、图片。你的钱包在 BNB Smart Chain 上签名创建代币，它的交易对就是这种材料。</p></div>
+    <div><b>3</b><h3>每 5 分钟派发</h3><p>代币的手续费被换成它的材料，按持仓比例派发给持有者。持有材料的人，也从建在它上面的每个代币中获得分红。</p></div>
+  </div>
+  <div class="dark">
+    <div><h2>每一笔交易，都在<em>添砖加瓦</em>。</h2><p>你在「砖」上发射的代币，每笔交易的手续费都会买入「砖」并派发给持有者。「砖」的持有者又从所有建在「砖」上的代币中获益，最终这一切都回到 $建造世界。</p><button class="btn y" type="button" id="launchB2">在材料上发射 →</button></div>
+    <div class="flow"><div><b>$建造世界</b>母代币，所有材料都与它配对</div><div class="ar">↓</div><div><b>材料</b>砖 · 钢 · 木 · 水泥 · 玻璃 …</div><div class="ar">↓</div><div><b>代币</b>持有者以材料获得分红</div></div>
+  </div>
+</section>
+</main>
+<footer>建造者世界 Builder World · $建造世界 · <a id="xFoot" href="#" target="_blank" rel="noopener noreferrer">@BuilderWorldBNB ↗</a><br><br>建造者世界是运行在 BNB Chain 上的独立社区项目，与 Binance（币安）、BNB Chain 官方或 PancakeSwap 均无隶属或合作关系。本页的材料、代币、派发和动态均为示例或预览，正式功能将在 $建造世界 发射后开放。合约地址只在官方 X 上公布。加密资产风险很高，本页内容不构成投资建议。</footer>
+
+<div class="modal" id="launchM"><div class="mb"><div class="mh">在材料上发射代币<button type="button" data-close aria-label="关闭">✕</button></div><div class="bd f">
+  <label>选择材料</label><div class="mgrid" id="lMats"></div>
+  <div class="r2"><div><label for="lN">名称</label><input id="lN" maxlength="20" value="金砖小队"></div><div><label for="lT">代码</label><input id="lT" maxlength="10" value="金砖"></div></div>
+  <label for="lD">简介</label><textarea id="lD" rows="2" maxlength="140">一群用金砖盖楼的建造者。</textarea>
+  <div class="r2"><div><label for="lB">首购（BNB）</label><input id="lB" type="number" min="0" step="0.01" value="0.1"></div><div><label for="lX">X 链接</label><input id="lX" placeholder="https://x.com/..."></div></div>
+  <div class="note">你的代币将与 <b id="lPair">砖</b> 配对。持有者每 5 分钟以 <b id="lPair2">砖</b> 获得分红。发射在 $建造世界 上线后开放，届时由你的钱包在 BNB Smart Chain 上签名创建，建造者世界不会代你持有任何资金。</div>
+  <div style="display:flex;gap:10px;margin-top:16px"><button class="btn k" type="button" id="lGo">预览发射 →</button><button class="btn o" type="button" data-close>取消</button></div>
+</div></div></div>
+<div class="modal" id="matM"><div class="mb"><div class="mh" id="mmH">材料</div><div class="bd" id="mmB"></div></div></div>
+<div id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+/* ================= CONFIG ================= */
+var CONFIG={
+  xUrl:'https://x.com/BuilderWorldBNB',
+  ca:'',       // $建造世界 合约地址 (BEP-20)
+  buyUrl:''    // 例如 PancakeSwap 链接
+};
+/* ========================================== */
+function $(s){return document.querySelector(s)}
+function $$(s){return Array.prototype.slice.call(document.querySelectorAll(s))}
+var tt;function toast(m){var t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(function(){t.classList.remove('show')},2800)}
+function srand(s){return function(){s=(s*1664525+1013904223)>>>0;return s/4294967296}}
+function esc(t){return String(t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+
+/* ================= PIXEL MATERIAL ICONS (16x16) ================= */
+function px(w,h){var c=document.createElement('canvas');c.width=w;c.height=h;return c}
+function R(x,a,b,w,h,c){x.fillStyle=c;x.fillRect(a,b,w,h)}
+var ICON={
+ brick:function(x){R(x,0,0,16,16,'#7a3b22');var rows=['#c4572e','#b24c28'];for(var y=1;y<16;y+=4){var off=(y/4|0)%2?0:4;for(var X=-4+off;X<16;X+=8){R(x,X+1,y,6,3,rows[(y+X)&1]);R(x,X+1,y,6,1,'#e07a4c')}}},
+ steel:function(x){R(x,0,0,16,16,'#9aa3ad');R(x,2,3,12,3,'#5e6670');R(x,6,6,4,5,'#5e6670');R(x,2,11,12,3,'#5e6670');R(x,2,3,12,1,'#d6dbe0');R(x,2,11,12,1,'#d6dbe0');R(x,7,6,1,5,'#c4cad1')},
+ wood:function(x){R(x,0,0,16,16,'#8a5a2b');for(var i=0;i<3;i++){R(x,1,2+i*5,14,4,'#c08a4a');R(x,1,2+i*5,14,1,'#e0b070');R(x,12,3+i*5,2,2,'#8a5a2b');R(x,13,4+i*5,1,1,'#5a3a1a')}},
+ cement:function(x){R(x,0,0,16,16,'#b7bdc6');var r=srand(7);for(var i=0;i<40;i++)R(x,r()*16|0,r()*16|0,1,1,r()<.5?'#8f959e':'#e1e4e8');R(x,3,4,10,9,'#d9cfb8');R(x,3,4,10,2,'#F0B90B');R(x,5,8,6,1,'#7a6a4a');R(x,5,10,4,1,'#7a6a4a')},
+ glass:function(x){R(x,0,0,16,16,'#bfe6f2');R(x,1,1,14,14,'#8fd0e6');R(x,7,1,2,14,'#e8f7fc');R(x,1,7,14,2,'#e8f7fc');R(x,3,3,2,2,'#ffffff');R(x,10,10,2,2,'#ffffff');R(x,0,0,16,1,'#5a8a9a');R(x,0,15,16,1,'#5a8a9a')},
+ gold:function(x){R(x,0,0,16,16,'#3a2c00');R(x,2,6,12,6,'#F0B90B');R(x,4,4,8,2,'#FCD535');R(x,2,6,12,1,'#ffe680');R(x,2,11,12,1,'#c99400');R(x,5,7,3,1,'#fff6c0')},
+ stone:function(x){R(x,0,0,16,16,'#6b7079');R(x,2,4,7,6,'#9aa0a8');R(x,8,7,6,6,'#8a9098');R(x,3,10,5,4,'#a8aeb6');R(x,3,4,7,1,'#c4c9cf')},
+ sand:function(x){R(x,0,0,16,16,'#f0d9a0');var r=srand(3);for(var i=0;i<30;i++)R(x,r()*16|0,r()*16|0,1,1,r()<.5?'#d9b870':'#fff0c8');R(x,0,11,16,5,'#e0c080')},
+ crane:function(x){R(x,0,0,16,16,'#181a20');R(x,3,2,2,13,'#F0B90B');R(x,3,2,12,2,'#F0B90B');R(x,12,4,1,5,'#b7bdc6');R(x,11,9,3,2,'#ffffff');R(x,1,14,6,1,'#707a8a')}
+};
+function iconCanvas(k,size){var c=px(16,16);ICON[k](c.getContext('2d'));if(!size)return c;var b=px(size,size),y=b.getContext('2d');y.imageSmoothingEnabled=false;y.drawImage(c,0,0,size,size);return b}
+var MATS=[{k:'brick',n:'砖',t:'砖'},{k:'steel',n:'钢',t:'钢'},{k:'wood',n:'木',t:'木'},{k:'cement',n:'水泥',t:'水泥'},{k:'glass',n:'玻璃',t:'玻璃'},{k:'stone',n:'石',t:'石'},{k:'sand',n:'沙',t:'沙'},{k:'gold',n:'金砖',t:'金砖'}];
+
+/* ================= THE BOT + WORLD (pixel canvas) ================= */
+var W=240,H=141,wc=$('#world'),wx=wc.getContext('2d'),wave=0,talk=0;
+// bot sprite 20x24 using palette: k black, g gold, G dark gold, w white, s grey
+var BOT=[
+'......gggggggg......',
+'....gggGggggGggg....',
+'...ggGggggggggGgg...',
+'...gggggggggggggg...',
+'..kkkkkkkkkkkkkkkk..',
+'...kwwwwwwwwwwwwk...',
+'...kwkkkwwwwkkkwk...',
+'...kwkwkwwwwkwkwk...',
+'...kwkkkwwwwkkkwk...',
+'...kwwwwwwwwwwwwk...',
+'...kwwwwkkkkwwwwk...',
+'...kkkkkkkkkkkkkk...',
+'.....kkkkkkkkkk.....',
+'...ggggggggggggggg..',
+'..kgggggkkkkggggggk.',
+'..kgggggkggkggggggk.',
+'..kgggggkkkkggggggk.',
+'..kggggggggggggggggk',
+'..kgggggggggggggggk.',
+'...kkkkkkkkkkkkkkk..',
+'....kkk......kkk....',
+'....kkk......kkk....',
+'...kkkkk....kkkkk...',
+'...kkkkk....kkkkk...'];
+var BC={k:'#181a20',g:'#F0B90B',G:'#c99400',w:'#ffffff',s:'#b7bdc6'};
+function drawBot(x,X,Y,s,t){var blink=(t%3600)<140,bob=Math.round(Math.sin(t*.004)*1);for(var r=0;r<BOT.length;r++)for(var c=0;c<BOT[r].length;c++){var ch=BOT[r][c];if(ch==='.')continue;var col=BC[ch];if(blink&&r>=6&&r<=8&&ch==='w'&&(c>=5&&c<=7||c>=12&&c<=14))col='#181a20';R(x,X+c*s,Y+(r+(r<20?bob:0))*s,s,s,col)}
+  // arm with hammer (waves when clicked)
+  var a=wave>0?Math.sin(t*.03)*.9:Math.sin(t*.003)*.15,ax=X+18*s,ay=Y+(15+bob)*s;x.save();x.translate(ax,ay);x.rotate(-.6+a);R(x,0,-s,6*s,2*s,'#181a20');R(x,5*s,-4*s,2*s,8*s,'#707a8a');R(x,4*s,-5*s,4*s,3*s,'#b7bdc6');x.restore();
+  R(x,X-1*s,Y+(15+bob)*s,3*s,2*s,'#181a20')}
+var BLOCKS=[];
+function world(t){var x=wx;x.clearRect(0,0,W,H);
+  // planet (pixel globe, gold/black/white)
+  var cx=W/2,cy=H+22,r=72;for(var yy=-r;yy<=r;yy++)for(var xx=-r;xx<=r;xx++){var d=Math.hypot(xx,yy);if(d>r)continue;if(cy+yy>H)continue;var nx=xx/r,ny=yy/r,lit=-nx*.5-ny*.7+Math.sqrt(Math.max(0,1-nx*nx-ny*ny))*.5;var u=xx+t*.006;var land=(Math.sin(u*.085+1)+Math.cos(yy*.12+u*.04)*1.1+Math.sin(u*.21+yy*.15)*.35)>.95;var c=land?(lit>.55?'#FCD535':lit>.2?'#F0B90B':'#c99400'):(lit>.55?'#5e6670':lit>.2?'#2b3139':'#181a20');if(d>r-1.2)c='#181a20';R(x,cx+xx|0,cy+yy|0,1,1,c)}
+  // little buildings on top of the planet
+  [[-46,'#ffffff',10],[-36,'#b7bdc6',16],[-26,'#ffffff',22],[30,'#ffffff',14],[40,'#b7bdc6',20],[50,'#ffffff',9]].forEach(function(b){var bx=cx+b[0],by=cy-Math.sqrt(r*r-b[0]*b[0])+1;R(x,bx-3,by-b[2],7,b[2],'#181a20');R(x,bx-2,by-b[2]+1,5,b[2]-1,b[1]);for(var w=by-b[2]+2;w<by-1;w+=3)R(x,bx-1,w,1,1,'#F0B90B'),R(x,bx+1,w,1,1,'#F0B90B')});
+  // crane
+  var kx=cx+14,ky=cy-r+2;R(x,kx,ky-40,3,40,'#181a20');for(var q=ky-38;q<ky;q+=4)R(x,kx+1,q,1,2,'#F0B90B');R(x,kx-6,ky-40,36,3,'#181a20');R(x,kx-5,ky-39,34,1,'#F0B90B');var hk=Math.sin(t*.002)*5;R(x,kx+26,ky-37,1,12+hk,'#707a8a');R(x,kx+22,ky-25+hk,9,5,'#c4572e');R(x,kx+22,ky-25+hk,9,1,'#e07a4c');
+  // bot standing on planet
+  drawBot(x,cx-34,cy-r-48+2,2,t);
+  // falling blocks the bot catches (on click)
+  BLOCKS=BLOCKS.filter(function(b){b.vy+=.12;b.y+=b.vy;b.x+=b.vx;x.drawImage(b.ic,b.x|0,b.y|0,12,12);return b.y<H})}
+var wv=true;if('IntersectionObserver' in window)new IntersectionObserver(function(e){wv=e[0].isIntersecting}).observe(wc);
+(function loop(t){if(wv)world(t);if(wave>0)wave-=.016;requestAnimationFrame(loop)})(0);
+var LINES=['我是建造者，点我！👷','一砖一瓦，建造世界。','持有材料，坐收分红。','每 5 分钟派发一次 BNB 价值。','选一种材料，发射你的代币！'],li=0;
+setTimeout(function(){$('#bubble').classList.add('on')},800);
+wc.addEventListener('click',function(){wave=1.4;li=(li+1)%LINES.length;$('#bubble').textContent=LINES[li];for(var i=0;i<6;i++){var m=MATS[Math.random()*5|0];BLOCKS.push({x:W/2-40+Math.random()*80,y:-10-Math.random()*30,vx:(Math.random()-.5)*.6,vy:0,ic:iconCanvas(m.k)})}});
+// token icon (the bot head)
+(function(){var x=$('#tokC').getContext('2d');R(x,0,0,16,16,'#F0B90B');R(x,3,2,10,3,'#181a20');R(x,2,5,12,8,'#181a20');R(x,4,7,8,4,'#ffffff');R(x,5,8,2,2,'#181a20');R(x,9,8,2,2,'#181a20');R(x,4,4,8,1,'#c99400')})();
+
+/* ================= ORBITING MATERIALS ================= */
+var stage=$('#stage'),ORBS=[];
+MATS.slice(0,5).forEach(function(m,i){var o=document.createElement('div');o.className='orb';o.appendChild(iconCanvas(m.k,34));var l=document.createElement('span');l.className='lbl';l.textContent=m.n+' · $'+m.t;o.appendChild(l);o.addEventListener('click',function(){openMat(i)});stage.appendChild(o);ORBS.push(o)});
+function orbit(t){var r=stage.getBoundingClientRect(),cx=r.width/2,cy=r.height/2+10,rx=Math.min(250,r.width*.42),ry=Math.min(130,r.height*.4);ORBS.forEach(function(o,i){var a=t*.00018+i/ORBS.length*Math.PI*2,s=o.offsetWidth;o.style.left=(cx+Math.cos(a)*rx-s/2)+'px';o.style.top=(cy+Math.sin(a)*ry-s/2)+'px';o.style.zIndex=Math.sin(a)>0?3:0;o.style.opacity=Math.sin(a)>0?1:.88})}
+(function loop2(t){if(wv)orbit(t);requestAnimationFrame(loop2)})(0);
+
+/* ================= MATERIALS GRID ================= */
+function shortCa(i){var r=srand(i*331+9),h='0x';for(var k=0;k<40;k++)h+='0123456789abcdef'[r()*16|0];return h.slice(0,6)+'…'+h.slice(-4)}
+function renderMats(n){var G=$('#matGrid');G.innerHTML='';MATS.slice(0,n).forEach(function(m,i){var d=document.createElement('div');d.className='mat';d.innerHTML='<div class="top"><div class="ic"></div><div class="nm"><b>'+m.n+'</b><span>$'+m.t+'</span></div><span class="no">#'+('0'+(i+1)).slice(-2)+'</span></div><div class="bot"><span>CA</span><span class="pill"><i></i>即将上线</span></div>';d.querySelector('.ic').appendChild(iconCanvas(m.k,36));d.addEventListener('click',function(){openMat(i)});G.appendChild(d)});
+  if(n<MATS.length){var mo=document.createElement('div');mo.className='mat more';mo.textContent='还有 '+(MATS.length-n)+' 种材料 · 查看全部 →';mo.addEventListener('click',function(){renderMats(MATS.length)});G.appendChild(mo)}}
+renderMats(5);$('#allMats').addEventListener('click',function(e){e.preventDefault();renderMats(MATS.length)});
+$('#hMat').textContent=MATS.length+' / 50';
+var sel=$('#matSel');MATS.forEach(function(m,i){var o=document.createElement('option');o.value=i;o.textContent=m.n;sel.appendChild(o)});
+
+/* ================= COINS (sample) ================= */
+var COINS=[['金砖小队','金砖',0,182,0.84,2],['钢铁侠客','钢侠',1,141,0.61,5],['木头人','木头人',2,96,0.33,11],['水泥狗','水泥狗',3,77,0.27,18],['玻璃心','玻璃心',4,58,0.19,26],['砖家','砖家',0,44,0.12,33],['石头记','石头记',5,31,0.08,47],['沙雕','沙雕',6,22,0.05,61]].map(function(c,i){return {n:c[0],t:c[1],m:c[2],mc:c[3],paid:c[4],age:c[5],id:i}});
+var SORT='mc';
+function coinIcon(c){var b=px(16,16),x=b.getContext('2d');var ic=iconCanvas(MATS[c.m].k);x.drawImage(ic,0,0);x.fillStyle='rgba(24,26,32,.55)';x.fillRect(0,9,16,7);x.fillStyle='#F0B90B';x.fillRect(5,10,6,5);x.fillStyle='#181a20';x.fillRect(6,11,1,1);x.fillRect(9,11,1,1);x.fillRect(6,13,4,1);return b}
+function renderCoins(){var L=$('#coinList'),q=$('#q').value.trim(),mf=sel.value;var list=COINS.filter(function(c){return (!q||c.n.indexOf(q)>=0||c.t.indexOf(q)>=0||MATS[c.m].n.indexOf(q)>=0)&&(mf===''||c.m==mf)});
+  list.sort(function(a,b){return SORT==='mc'?b.mc-a.mc:SORT==='new'?a.age-b.age:b.paid-a.paid});
+  L.innerHTML='<div class="crow h"><span></span><span>代币</span><span class="c3">材料</span><span class="c4">市值</span><span class="c5">已派发</span><span>年龄</span></div>';
+  if(!list.length){L.insertAdjacentHTML('beforeend','<div class="emptyc">这里还没有代币。成为第一个发射的人吧。</div>');return}
+  list.forEach(function(c){var r=document.createElement('div');r.className='crow';var cv=coinIcon(c);cv.className='pix';r.appendChild(cv);r.insertAdjacentHTML('beforeend','<span><b>'+esc(c.n)+'<span class="tag">示例</span></b><small>$'+esc(c.t)+' / '+MATS[c.m].n+'</small></span><span class="c3">'+MATS[c.m].n+'</span><span class="c4">$'+c.mc+'K</span><span class="c5 g">'+c.paid.toFixed(2)+' BNB</span><span><small>'+(c.age<60?c.age+' 分钟':Math.round(c.age/60)+' 小时')+'</small></span>');L.appendChild(r)});
+  $('#hCoins').textContent=COINS.length}
+$$('#sortSeg button').forEach(function(b){b.addEventListener('click',function(){SORT=b.getAttribute('data-s');$$('#sortSeg button').forEach(function(z){z.classList.toggle('on',z===b)});renderCoins()})});
+$('#q').addEventListener('input',renderCoins);sel.addEventListener('change',renderCoins);renderCoins();
+$('#moreCoins').addEventListener('click',function(e){e.preventDefault();toast('完整代币列表将在 $建造世界 发射后开放。')});
+
+/* ================= LIVE + PAYOUT TIMER (sample) ================= */
+var paid=COINS.reduce(function(a,c){return a+c.paid},0),pot=0.42;
+function liveRow(c,amt,n,isNew){var d=document.createElement('div');d.className='lrow'+(isNew?' new':'');var cv=iconCanvas(MATS[c.m].k,26);cv.className='pix';d.appendChild(cv);d.insertAdjacentHTML('beforeend','<span>$'+esc(c.t)+' 以 '+MATS[c.m].n+' 向 '+n+' 位持有者派发了 <span class="g">'+amt.toFixed(3)+' BNB</span></span><a href="#" onclick="return false">查看</a>');return d}
+(function(){var L=$('#liveList');[[0,.084,12],[1,.061,9],[2,.033,6],[3,.027,4],[0,.019,12]].forEach(function(r){L.appendChild(liveRow(COINS[r[0]],r[1],r[2]))})})();
+var CYCLE=300000;function tick(){var left=CYCLE-(Date.now()%CYCLE),s=Math.floor(left/1000);$('#hNext').textContent=('0'+Math.floor(s/60)).slice(-2)+':'+('0'+s%60).slice(-2);$('#hPaid').textContent=paid.toFixed(2)+' BNB';$('#pot').textContent=pot.toFixed(3)+' BNB';
+  if(tick.last!=null&&left>tick.last){var c=COINS[Math.random()*COINS.length|0],amt=.005+Math.random()*.05,L=$('#liveList');L.prepend(liveRow(c,amt,2+(Math.random()*12|0),1));while(L.children.length>6)L.lastChild.remove();paid+=amt;pot=Math.max(.05,pot-amt*.5);toast('示例派发：$'+c.t+' 的持有者收到了 '+MATS[c.m].n)}tick.last=left;pot+=.0001}
+setInterval(tick,1000);tick();
+
+/* ================= MODALS ================= */
+var LM=0;
+function openM(id){$(id).classList.add('on')}
+$$('[data-close]').forEach(function(b){b.addEventListener('click',function(){b.closest('.modal').classList.remove('on')})});
+$$('.modal').forEach(function(m){m.addEventListener('click',function(e){if(e.target===m)m.classList.remove('on')})});
+addEventListener('keydown',function(e){if(e.key==='Escape')$$('.modal').forEach(function(m){m.classList.remove('on')})});
+(function(){var G=$('#lMats');MATS.forEach(function(m,i){var b=document.createElement('button');b.type='button';if(i===0)b.className='on';b.appendChild(iconCanvas(m.k,22));b.insertAdjacentText('beforeend',m.n);b.addEventListener('click',function(){LM=i;$$('#lMats button').forEach(function(z){z.classList.toggle('on',z===b)});$('#lPair').textContent=m.n;$('#lPair2').textContent=m.n});G.appendChild(b)})})();
+function openLaunch(m){if(m!=null){LM=m;$$('#lMats button').forEach(function(z,i){z.classList.toggle('on',i===m)});$('#lPair').textContent=MATS[m].n;$('#lPair2').textContent=MATS[m].n}openM('#launchM')}
+['#launchB','#launchB2'].forEach(function(s){$(s).addEventListener('click',function(){openLaunch()})});
+$('#launchNav').addEventListener('click',function(e){e.preventDefault();$('#drawer').classList.remove('on');openLaunch()});
+$('#lGo').addEventListener('click',function(){toast('预览：$'+($('#lT').value||'代币')+' 将与「'+MATS[LM].n+'」配对，首购 '+(+$('#lB').value||0)+' BNB。正式发射在 $建造世界 上线后开放。')});
+function openMat(i){var m=MATS[i],coins=COINS.filter(function(c){return c.m===i});$('#mmH').innerHTML='';var ic=iconCanvas(m.k,30);ic.className='pix';$('#mmH').appendChild(ic);$('#mmH').insertAdjacentHTML('beforeend','<span>'+m.n+' · $'+m.t+'</span><button type="button" aria-label="关闭">✕</button>');$('#mmH button').addEventListener('click',function(){$('#matM').classList.remove('on')});
+  $('#mmB').innerHTML='<div class="kv"><span>编号</span><b>#'+('0'+(i+1)).slice(-2)+' / 50</b><span>配对</span><b>$建造世界</b><span>合约</span><b class="mono">即将上线</b><span>建在它上面的代币</span><b>'+coins.length+' 个（示例）</b><span>累计派发</span><b style="color:var(--green)">'+coins.reduce(function(a,c){return a+c.paid},0).toFixed(2)+' BNB（示例）</b></div><p style="color:var(--grey);font-size:14px;margin:14px 0">在「'+m.n+'」上发射的每个代币，都会把手续费换成「'+m.n+'」，派发给它的持有者。持有「'+m.n+'」本身，则能从所有建在它上面的代币中获得分红。</p><button class="btn k" type="button" id="mmL">在「'+m.n+'」上发射 →</button>';
+  $('#mmL').addEventListener('click',function(){$('#matM').classList.remove('on');openLaunch(i)});openM('#matM')}
+
+/* ================= NAV / WALLET / LINKS ================= */
+$('#mBtn').addEventListener('click',function(e){e.stopPropagation();$('#drawer').classList.toggle('on')});document.addEventListener('click',function(e){if(!e.target.closest('#drawer'))$('#drawer').classList.remove('on')});
+$$('#drawer a[href^="#"]').forEach(function(a){a.addEventListener('click',function(){$('#drawer').classList.remove('on')})});
+var ACC=null;$('#conn').addEventListener('click',function(){var eth=window.ethereum||window.okxwallet||window.trustwallet;if(!eth){toast('没有检测到钱包。请安装 MetaMask、Trust Wallet 或 OKX Wallet，或继续以访客身份浏览。');return}
+  eth.request({method:'eth_requestAccounts'}).then(function(a){ACC=a[0];return eth.request({method:'eth_chainId'})}).then(function(cid){if(cid!=='0x38')return eth.request({method:'wallet_switchEthereumChain',params:[{chainId:'0x38'}]}).catch(function(){toast('请切换到 BNB Smart Chain（链 ID 56）')})}).then(function(){return eth.request({method:'eth_getBalance',params:[ACC,'latest']})}).then(function(b){$('#conn').classList.add('on');$('#conn').textContent=ACC.slice(0,6)+'…'+ACC.slice(-4)+' · '+(parseInt(b,16)/1e18).toFixed(3)+' BNB'}).catch(function(){if(ACC){$('#conn').classList.add('on');$('#conn').textContent=ACC.slice(0,6)+'…'+ACC.slice(-4)}else toast('已取消连接。')})});
+function wire(a,url,msg){if(!a)return;if(url)a.href=url;else{a.removeAttribute('target');a.addEventListener('click',function(e){e.preventDefault();toast(msg)})}}
+['#xTop','#xFoot'].forEach(function(s){wire($(s),CONFIG.xUrl,'官方 X 即将公布，发射信息会在那里发布。')});
+wire($('#tokA'),CONFIG.buyUrl,'$建造世界 即将发射，合约地址会在官方 X 上公布。');
+if(CONFIG.ca){$('#caShort').textContent=CONFIG.ca.slice(0,6)+'…'+CONFIG.ca.slice(-4)}
+$('#caCopy').addEventListener('click',function(){if(!CONFIG.ca){toast('合约地址还没有公布，请关注官方 X。');return}try{navigator.clipboard.writeText(CONFIG.ca);toast('已复制合约地址')}catch(e){toast(CONFIG.ca)}});
+addEventListener('scroll',function(){var y=scrollY+120,t='首页';[['mats','材料'],['coins','代币'],['live','实时'],['how','运作方式']].forEach(function(p){var el=document.getElementById(p[0]);if(el.offsetTop<=y)t=p[1]});$('#crumbT').textContent=t},{passive:true});
+})();
+</script>
+</body>
+</html>
